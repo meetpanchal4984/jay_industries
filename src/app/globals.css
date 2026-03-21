@@ -1,4 +1,3 @@
-
 @import "tailwindcss";
 
 :root {
@@ -225,10 +224,16 @@ button {
   left: 0;
   width: 100%;
   z-index: 105;
-  padding: 1rem 5%;
+  padding: 0.25rem 5%;
   background: var(--bg-main);
   border-bottom: 1px solid var(--glass-border);
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s;
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    padding: 1rem 5%;
+  }
 }
 
 .navbar-visible {
@@ -249,7 +254,7 @@ button {
 }
 
 .logo-img {
-  height: 40px;
+  height: clamp(48px, 6vw, 64px);
   filter: var(--logo-filter);
   transition: var(--transition);
 }
@@ -317,63 +322,156 @@ button {
   .mobile-menu {
     display: flex;
     position: fixed;
-    top: 0;
-    right: 0;
-    left: auto;
+    top: 1rem;
+    right: 1rem;
+    bottom: 1rem;
     width: 320px;
-    height: auto;
-    background: var(--bg-main);
+    background: var(--bg-card);
     flex-direction: column;
-    align-items: stretch;
-    justify-content: flex-start;
-    gap: 1.25rem;
-    transform: translateX(100%);
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    padding: 3rem 1.5rem 2rem 2rem;
+    border-radius: 16px;
     z-index: 106;
-    box-shadow: -20px 0 50px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+    transform: translateX(calc(100% + 2rem));
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 1.5rem;
     overflow-y: auto;
-    border-bottom-left-radius: 12px;
   }
 
   .mobile-open {
     transform: translateX(0);
   }
 
+  .mobile-menu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--glass-border);
+  }
+
+  .mobile-close-btn {
+    background: transparent;
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-main);
+    cursor: pointer;
+    transition: var(--transition);
+  }
+
+  .mobile-close-btn:hover {
+    background: var(--bg-alt);
+  }
+
+  .mobile-links-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    flex-grow: 1;
+  }
+
   .mobile-link {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
     width: 100%;
-    font-size: 1.25rem;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text-main);
+    padding: 1rem;
+    border-radius: 12px;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+
+  .mobile-link:hover,
+  .mobile-link:active {
+    background: rgba(139, 92, 246, 0.08);
+    color: #8b5cf6;
+  }
+
+  .mobile-icon {
+    color: var(--steel);
+    transition: color 0.2s ease;
+  }
+
+  .mobile-link:hover .mobile-icon {
+    color: #8b5cf6;
+  }
+
+  .mobile-menu-footer {
+    margin-top: auto;
+    background: var(--bg-main);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 1.5rem;
+  }
+
+  .mobile-help-text {
+    font-size: 0.95rem;
     font-weight: 700;
     color: var(--text-main);
-    padding: 0.9rem 0.5rem;
-    padding-left: 0.5rem;
-    text-align: left;
-    letter-spacing: 0.2px;
-    border-radius: 6px;
-    transition: background 0.15s ease, color 0.15s ease;
+    margin-bottom: 0.25rem;
   }
 
-  .mobile-link:hover {
-    background: rgba(255, 255, 255, 0.03);
+  .mobile-help-sub {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    line-height: 1.5;
   }
 
-  .mobile-menu .btn {
-    margin-top: 1.5rem;
-    font-size: 1rem;
-    padding: 0.9rem 1rem;
-    width: calc(100% - 1rem);
-    margin-left: 0.5rem;
-    align-self: stretch;
+  .mobile-contact-btn {
+    width: 100%;
+    background: #d4f34a;
+    color: #111;
     border-radius: 8px;
-    text-align: center;
     font-weight: 700;
-    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.8rem;
+    border: none;
+    transition: all 0.2s;
   }
 
-  .mobile-menu .btn-primary {
-    background: linear-gradient(135deg, var(--copper), var(--copper-light));
-    color: var(--btn-text);
+  .mobile-contact-btn:hover {
+    background: #c3e23b;
+    transform: translateY(-2px);
+  }
+
+  .mobile-profile-pill {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    padding: 0.75rem;
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+  }
+
+  .profile-avatar {
+    background: #6d28d9;
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.8rem;
+  }
+
+  .profile-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--text-main);
   }
 
   .mobile-overlay {
@@ -969,7 +1067,9 @@ button {
     width: 100%;
     max-width: 300px;
   }
-}.counter {
+}
+
+.counter {
   font-size: 16px;
   padding: 5px 10px;
   border-radius: 5px;
@@ -982,6 +1082,7 @@ button {
   &:hover {
     border-color: var(--accent-border);
   }
+
   &:focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 2px;
@@ -1013,8 +1114,7 @@ button {
     z-index: 1;
     top: 34px;
     height: 28px;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(44deg) rotateY(39deg)
-      scale(1.4);
+    transform: perspective(2000px) rotateZ(300deg) rotateX(44deg) rotateY(39deg) scale(1.4);
   }
 
   .vite {
@@ -1022,8 +1122,7 @@ button {
     top: 107px;
     height: 26px;
     width: auto;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(40deg) rotateY(39deg)
-      scale(0.8);
+    transform: perspective(2000px) rotateZ(300deg) rotateX(40deg) rotateY(39deg) scale(0.8);
   }
 }
 
@@ -1046,9 +1145,10 @@ button {
   border-top: 1px solid var(--border);
   text-align: left;
 
-  & > div {
+  &>div {
     flex: 1 1 0;
     padding: 32px;
+
     @media (max-width: 1024px) {
       padding: 24px 20px;
     }
@@ -1101,6 +1201,7 @@ button {
     &:hover {
       box-shadow: var(--shadow);
     }
+
     .button-icon {
       height: 18px;
       width: 18px;
@@ -1127,6 +1228,7 @@ button {
 #spacer {
   height: 88px;
   border-top: 1px solid var(--border);
+
   @media (max-width: 1024px) {
     height: 48px;
   }
@@ -1148,6 +1250,7 @@ button {
     left: 0;
     border-left-color: var(--border);
   }
+
   &::after {
     right: 0;
     border-right-color: var(--border);
