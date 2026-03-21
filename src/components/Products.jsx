@@ -83,7 +83,7 @@ const Products = () => {
 
         {/* Pagination Controls */}
         {totalPages > 1 && (
-          <div className="pagination-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '3rem', gap: '1rem' }}>
+          <div className="pagination-container" style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', marginTop: '3rem', gap: '1rem' }}>
             {currentPage > 1 && (
               <button
                 className="btn btn-outline"
@@ -93,7 +93,7 @@ const Products = () => {
               </button>
             )}
 
-            <div className="page-numbers" style={{ display: 'flex', gap: '0.5rem' }}>
+            <div className="page-numbers" style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', justifyContent: 'center' }}>
               {Array.from({ length: totalPages }).map((_, i) => (
                 <button
                   key={i}

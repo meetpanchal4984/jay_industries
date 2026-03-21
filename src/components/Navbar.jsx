@@ -45,9 +45,9 @@ const Navbar = () => {
           {/* Desktop Menu */}
           <div className="nav-links">
             <Link href="/" className="nav-link">Home</Link>
-            <Link href="/about" className="nav-link">About Us</Link>
             <Link href="/services" className="nav-link">Services</Link>
             <Link href="/products" className="nav-link">Products</Link>
+            <Link href="/about" className="nav-link">About Us</Link>
             <Link href="/contact" className="btn btn-primary nav-btn">Contact Us</Link>
           </div>
 
@@ -74,14 +74,14 @@ const Navbar = () => {
           <Link href="/" className="mobile-link" onClick={toggleMenu}>
             <LayoutGrid size={20} className="mobile-icon" /> Home
           </Link>
-          <Link href="/about" className="mobile-link" onClick={toggleMenu}>
-            <Users size={20} className="mobile-icon" /> About Us
-          </Link>
           <Link href="/services" className="mobile-link" onClick={toggleMenu}>
             <Briefcase size={20} className="mobile-icon" /> Services
           </Link>
           <Link href="/products" className="mobile-link" onClick={toggleMenu}>
             <Package size={20} className="mobile-icon" /> Products
+          </Link>
+          <Link href="/about" className="mobile-link" onClick={toggleMenu}>
+            <Users size={20} className="mobile-icon" /> About Us
           </Link>
         </div>
 
