@@ -103,7 +103,8 @@ export default function RegisterPage() {
     border: `2px solid ${isError ? '#ff4d4d' : '#ccc'}`,
     transition: 'border-color 0.3s ease',
     outline: 'none',
-    backgroundColor: 'white'
+    backgroundColor: 'white',
+    color: '#111'
   });
 
   return (

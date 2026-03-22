@@ -63,7 +63,8 @@ export default function LoginPage() {
     border: '2px solid #ccc',
     transition: 'border-color 0.3s ease',
     outline: 'none',
-    backgroundColor: 'white'
+    backgroundColor: 'white',
+    color: '#111'
   };
 
   return (
