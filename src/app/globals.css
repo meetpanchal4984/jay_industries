@@ -481,6 +481,13 @@ button {
     z-index: 104;
     animation: fadeIn 0.3s forwards;
   }
+
+  /* Hide toggle, logo and message/FAB when mobile menu is open */
+  body.mobile-menu-open .mobile-toggle-group,
+  body.mobile-menu-open .logo,
+  body.mobile-menu-open .fab-container {
+    display: none !important;
+  }
 }
 
 @keyframes fadeIn {
