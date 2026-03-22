@@ -41,7 +41,7 @@ const Navbar = () => {
     } else {
       document.body.classList.remove('mobile-menu-open');
     }
-    
+
     // Cleanup on unmount
     return () => {
       document.body.classList.remove('mobile-menu-open');
@@ -81,7 +81,7 @@ const Navbar = () => {
               <button onClick={handleLogout} className="btn btn-primary nav-btn" style={{ marginLeft: '1rem', cursor: 'pointer' }}>Logout</button>
             ) : (
               <div style={{ display: 'flex', gap: '0.5rem', marginLeft: '1rem' }}>
-                <Link href="/login" className="btn btn-outline nav-btn">Login</Link>
+                <Link href="/login" className="btn btn-outline nav-btn" style={{ background: 'white', color: '#111' }}>Login</Link>
                 <Link href="/register" className="btn btn-primary nav-btn">Register</Link>
               </div>
             )}
@@ -131,7 +131,7 @@ const Navbar = () => {
             </button>
           ) : (
             <>
-              <Link href="/login" className="btn btn-outline" onClick={toggleMenu} style={{ width: '100%', padding: '1rem', display: 'flex', justifyContent: 'center', background: 'white' }}>
+              <Link href="/login" className="btn btn-outline" onClick={toggleMenu} style={{ width: '100%', padding: '1rem', display: 'flex', justifyContent: 'center', background: 'white', color: '#111' }}>
                 Login
               </Link>
               <Link href="/register" className="btn btn-primary" onClick={toggleMenu} style={{ width: '100%', padding: '1rem', display: 'flex', justifyContent: 'center' }}>
