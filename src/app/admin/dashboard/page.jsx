@@ -3,24 +3,39 @@ import React, { useState, useEffect } from 'react';
 import AuthGuard from '@/components/AuthGuard';
 import { Users, UserCheck, Activity, Package, Plus, Image as ImageIcon, Type, FileText, X, ShieldAlert, ShieldCheck, ExternalLink, LogOut, Eye, EyeOff } from 'lucide-react';
 
-// CountUp Component for animated statistics
-const CountUp = ({ end, duration = 1500 }) => {
+// CountUp Component for animated statistics with smooth transitions
+const CountUp = ({ end, duration = 1000 }) => {
   const [count, setCount] = React.useState(0);
+  const prevValue = React.useRef(0);
 
   React.useEffect(() => {
-    let startTimestamp = null;
-    const step = (timestamp) => {
-      if (!startTimestamp) startTimestamp = timestamp;
-      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-      setCount(Math.floor(progress * end));
+    let startTime = null;
+    const startValue = prevValue.current;
+    const distance = end - startValue;
+
+    // Smooth easeOutExpo function
+    const easeOutExpo = (t) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t));
+
+    const animation = (currentTime) => {
+      if (!startTime) startTime = currentTime;
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const easedProgress = easeOutExpo(progress);
+
+      const currentValue = Math.round(startValue + distance * easedProgress);
+      setCount(currentValue);
+
       if (progress < 1) {
-        window.requestAnimationFrame(step);
+        requestAnimationFrame(animation);
+      } else {
+        prevValue.current = end;
       }
     };
-    window.requestAnimationFrame(step);
+
+    requestAnimationFrame(animation);
   }, [end, duration]);
 
-  return <span>{count}</span>;
+  return <span style={{ transition: 'all 0.5s ease-out' }}>{count}</span>;
 };
 
 export default function AdminDashboard() {
@@ -53,7 +68,7 @@ export default function AdminDashboard() {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
     };
-    
+
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
@@ -73,9 +88,7 @@ export default function AdminDashboard() {
       .then(data => {
         if (data.is_admin) {
           setIsAdmin(true);
-          fetchStats(token);
-          fetchUsers(token);
-          fetchAdminProducts(token);
+          fetchDashboardData(token);
         } else {
           window.location.href = "/";
         }
@@ -86,90 +99,96 @@ export default function AdminDashboard() {
       })
       .finally(() => setLoading(false));
 
-    // Polling logic for real-time status updates every 30 seconds
+    // Faster 2-second polling for real-time status updates
     const intervalId = setInterval(() => {
-      const token = localStorage.getItem("access_token");
-      if (token && isAdmin) {
-        fetchStats(token);
-        fetchUsers(token);
-        fetchAdminProducts(token);
+      if (!document.hidden && isAdmin) {
+        const token = localStorage.getItem("access_token");
+        if (token) {
+          fetchDashboardData(token);
+        }
       }
-    }, 30000);
+    }, 2000);
 
-    return () => clearInterval(intervalId);
+    // Instant refresh when focusing the tab
+    const handleFocus = () => {
+      const token = localStorage.getItem("access_token");
+      if (token && isAdmin) fetchDashboardData(token);
+    };
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      clearInterval(intervalId);
+      window.removeEventListener('focus', handleFocus);
+    };
   }, [isAdmin]);
 
-  const fetchStats = async (token) => {
+  const fetchDashboardData = async (token) => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/stats`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/dashboard-data`, {
         headers: { "Authorization": `Bearer ${token}` }
       });
-      const data = await res.json();
-      setStats(data);
+      if (res.ok) {
+        const data = await res.json();
+        setStats(data.stats);
+        setUsers(data.users);
+        setAdminProducts(data.products);
+      }
     } catch (err) {
-      console.error("Error fetching stats:", err);
-    }
-  };
-
-  const fetchUsers = async (token) => {
-    try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/users`, {
-        headers: { "Authorization": `Bearer ${token}` }
-      });
-      const data = await res.json();
-      setUsers(data);
-    } catch (err) {
-      console.error("Error fetching users:", err);
-    }
-  };
-
-  const fetchAdminProducts = async (token) => {
-    try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/products`, {
-        headers: { "Authorization": `Bearer ${token}` }
-      });
-      const data = await res.json();
-      setAdminProducts(data);
-    } catch (err) {
-      console.error("Error fetching products:", err);
+      console.error("Error fetching dashboard data:", err);
     }
   };
 
   const handleToggleAdmin = async (userId) => {
     const token = localStorage.getItem("access_token");
+    if (!token) return;
+
+    // Optimistic UI Update: Switch locally first for instantly visible reaction
+    const previousUsers = [...users];
+    setUsers(users.map(u => u.id === userId ? { ...u, is_admin: !u.is_admin } : u));
+
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/users/${userId}/toggle-admin`, {
-        method: "PUT",
+        method: 'PUT',
         headers: { "Authorization": `Bearer ${token}` }
       });
       if (res.ok) {
-        fetchUsers(token);
-        setMessage({ type: 'success', text: 'User permissions updated successfully!' });
+        fetchDashboardData(token);
+        setMessage({ type: 'success', text: 'Permissions updated instantly!' });
         setTimeout(() => setMessage({ type: '', text: '' }), 5000);
       } else {
+        // Revert on error
+        setUsers(previousUsers);
         const errorData = await res.json();
         setMessage({ type: 'error', text: errorData.detail || 'Failed to update permissions' });
         setTimeout(() => setMessage({ type: '', text: '' }), 5000);
       }
     } catch (err) {
-      console.error("Error toggling admin:", err);
+      setUsers(previousUsers);
+      console.error(err);
     }
   };
 
   const handleTogglePublish = async (productId) => {
     const token = localStorage.getItem("access_token");
+    if (!token) return;
+
+    // Optimistic UI Update: Switch locally first
+    const previousProducts = [...adminProducts];
+    setAdminProducts(adminProducts.map(p => p.id === productId ? { ...p, is_published: !p.is_published } : p));
+
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/products/${productId}/toggle-publish`, {
-        method: "PUT",
+        method: 'PUT',
         headers: { "Authorization": `Bearer ${token}` }
       });
       if (res.ok) {
-        fetchAdminProducts(token);
-        setMessage({ type: 'success', text: 'Product visibility updated!' });
-        setTimeout(() => setMessage({ type: '', text: '' }), 3000);
+        fetchDashboardData(token);
+      } else {
+        // Revert on error
+        setAdminProducts(previousProducts);
       }
     } catch (err) {
-      console.error("Error toggling publish:", err);
+      setAdminProducts(previousProducts);
     }
   };
 
@@ -185,7 +204,7 @@ export default function AdminDashboard() {
         headers: { "Authorization": `Bearer ${token}` }
       });
       if (res.ok) {
-        fetchAdminProducts(token);
+        fetchDashboardData(token);
         setMessage({ type: 'success', text: 'Product deleted permanently.' });
         setTimeout(() => setMessage({ type: '', text: '' }), 5000);
       }
@@ -258,7 +277,7 @@ export default function AdminDashboard() {
         setPreviewUrl(null);
         setSubFiles([]);
         setSubPreviews([]);
-        fetchAdminProducts(token);
+        fetchDashboardData(token);
         setTimeout(() => setMessage({ type: '', text: '' }), 5000);
       } else {
         const data = await res.json();
@@ -285,7 +304,7 @@ export default function AdminDashboard() {
     window.location.href = "/";
   };
 
-  const getFilteredUsers = () => {
+  const filteredUsers = React.useMemo(() => {
     return users.filter(user => {
       const matchesSearch =
         user.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -303,7 +322,7 @@ export default function AdminDashboard() {
 
       return matchesSearch && matchesRole && matchesStatus;
     });
-  };
+  }, [users, searchTerm, roleFilter, statusFilter]);
 
   if (loading) {
     return (
@@ -324,8 +343,8 @@ export default function AdminDashboard() {
           <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '2rem' }}>
             The Admin Dashboard is optimized for Desktop and Tablet experiences. Please log in from a larger device to manage your store.
           </p>
-          <button 
-            onClick={() => window.location.href = '/'} 
+          <button
+            onClick={() => window.location.href = '/'}
             style={{ width: '100%', padding: '1rem', background: 'var(--copper)', color: '#fff', borderRadius: '12px', fontWeight: '700', fontSize: '0.9rem' }}
           >
             Back to Website
@@ -415,17 +434,23 @@ export default function AdminDashboard() {
             {activeTab === 'users' && (
               <div>
                 <div className="grid-3 mb-12" style={{ gap: '1.5rem' }}>
-                  <div className="glass-panel" style={{ padding: '2.5rem' }}>
-                    <p className="text-muted" style={{ fontSize: '0.85rem', fontWeight: '600' }}>Total Accounts</p>
-                    <h3 style={{ fontSize: '3rem', fontWeight: '800', color: 'var(--text-main)' }}><CountUp end={stats.total_users} /></h3>
+                  <div className="glass-panel" style={{ padding: '2.5rem', transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)', cursor: 'default' }}>
+                    <p className="text-muted" style={{ fontSize: '0.85rem', fontWeight: '600', marginBottom: '0.5rem' }}>Total Accounts</p>
+                    <h3 style={{ fontSize: '3.5rem', fontWeight: '800', color: 'var(--text-main)', letterSpacing: '-1px' }}>
+                      <CountUp end={stats.total_users} />
+                    </h3>
                   </div>
-                  <div className="glass-panel" style={{ padding: '2.5rem' }}>
-                    <p className="text-muted" style={{ fontSize: '0.85rem', fontWeight: '600' }}>Authenticated</p>
-                    <h3 style={{ fontSize: '3rem', fontWeight: '800', color: '#25d366' }}><CountUp end={stats.logged_in_users} /></h3>
+                  <div className="glass-panel" style={{ padding: '2.5rem', transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)', cursor: 'default' }}>
+                    <p className="text-muted" style={{ fontSize: '0.85rem', fontWeight: '600', marginBottom: '0.5rem' }}>Authenticated</p>
+                    <h3 style={{ fontSize: '3.5rem', fontWeight: '800', color: '#10b981', letterSpacing: '-1px' }}>
+                      <CountUp end={stats.logged_in_users} />
+                    </h3>
                   </div>
-                  <div className="glass-panel" style={{ padding: '2.5rem' }}>
-                    <p className="text-muted" style={{ fontSize: '0.85rem', fontWeight: '600' }}>Live Session</p>
-                    <h3 style={{ fontSize: '3rem', fontWeight: '800', color: '#8b5cf6' }}><CountUp end={stats.active_users} /></h3>
+                  <div className="glass-panel" style={{ padding: '2.5rem', transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)', cursor: 'default' }}>
+                    <p className="text-muted" style={{ fontSize: '0.85rem', fontWeight: '600', marginBottom: '0.5rem' }}>Live Session</p>
+                    <h3 style={{ fontSize: '3.5rem', fontWeight: '800', color: '#8b5cf6', letterSpacing: '-1px' }}>
+                      <CountUp end={stats.active_users} />
+                    </h3>
                   </div>
                 </div>
 
@@ -434,7 +459,7 @@ export default function AdminDashboard() {
                     <Users size={24} style={{ color: 'var(--copper)' }} />
                     <h3 style={{ fontSize: '1.5rem', fontWeight: '800' }}>User Directory</h3>
                     <span style={{ padding: '0.2rem 0.6rem', borderRadius: '4px', background: 'rgba(255,255,255,0.05)', fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: '700' }}>
-                      {getFilteredUsers().length} RESULTS
+                      {filteredUsers.length} RESULTS
                     </span>
                   </div>
 
@@ -514,13 +539,13 @@ export default function AdminDashboard() {
                       </tr>
                     </thead>
                     <tbody>
-                      {getFilteredUsers().length === 0 ? (
+                      {filteredUsers.length === 0 ? (
                         <tr>
                           <td colSpan="5" style={{ textAlign: 'center', padding: '4rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
                             No users found matching your search criteria.
                           </td>
                         </tr>
-                      ) : getFilteredUsers().map(user => (
+                      ) : filteredUsers.map(user => (
                         <tr key={user.id} className="user-row" style={{ background: 'rgba(255,255,255,0.02)', borderRadius: '15px' }}>
                           <td style={{ padding: '1.25rem 1rem', borderRadius: '15px 0 0 15px' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
@@ -610,8 +635,8 @@ export default function AdminDashboard() {
                   <div className="glass-panel" style={{ padding: '2.5rem' }}>
                     <h3 style={{ fontSize: '1.5rem', fontWeight: '800', marginBottom: '2rem' }}>Add Product</h3>
                     <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                      <input type="text" name="name" value={productForm.name} onChange={handleInputChange} placeholder="Product Name" style={{ width: '100%', padding: '1rem', borderRadius: '12px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--glass-border)', color: '#fff' }} required />
-                      <textarea name="description" value={productForm.description} onChange={handleInputChange} placeholder="Description" rows="4" style={{ width: '100%', padding: '1rem', borderRadius: '12px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--glass-border)', color: '#fff', resize: 'none' }} required />
+                      <input type="text" name="name" value={productForm.name} onChange={handleInputChange} placeholder="Product Name" style={{ width: '100%', padding: '1rem', borderRadius: '12px', background: 'var(--bg-alt)', border: '1px solid var(--glass-border)', color: 'var(--text-main)' }} required />
+                      <textarea name="description" value={productForm.description} onChange={handleInputChange} placeholder="Description" rows="4" style={{ width: '100%', padding: '1rem', borderRadius: '12px', background: 'var(--bg-alt)', border: '1px solid var(--glass-border)', color: 'var(--text-main)', resize: 'none' }} required />
                       {/* Main Image Upload with removal */}
                       <div className="form-group" style={{ position: 'relative' }}>
                         <button type="button" onClick={() => document.getElementById('mainImg').click()} style={{ width: '100%', padding: '1rem', borderRadius: '12px', border: '2px dashed var(--glass-border)', background: 'transparent', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
@@ -703,9 +728,14 @@ export default function AdminDashboard() {
                       {adminProducts.map(product => (
                         <tr key={product.id} className="user-row" style={{ background: 'rgba(255,255,255,0.02)' }}>
                           <td style={{ padding: '1.5rem 1rem' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                              <img src={`${process.env.NEXT_PUBLIC_API_URL}${product.image_url}`} style={{ width: '50px', height: '50px', borderRadius: '8px', objectFit: 'cover' }} />
-                              <div style={{ fontWeight: '700' }}>{product.name}</div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+                              <img src={`${process.env.NEXT_PUBLIC_API_URL}${product.image_url}`} style={{ width: '56px', height: '56px', borderRadius: '10px', objectFit: 'cover', border: '1px solid var(--glass-border)' }} />
+                              <div>
+                                <div style={{ fontWeight: '800', fontSize: '1rem', color: 'var(--text-main)', marginBottom: '0.2rem' }}>{product.name}</div>
+                                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '500', maxWidth: '350px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                  {product.description}
+                                </div>
+                              </div>
                             </div>
                           </td>
                           <td>
