@@ -8,12 +8,32 @@ const Navbar = () => {
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     // Check local storage for token on mount
     const token = localStorage.getItem("access_token");
     if (token) {
       setIsLoggedIn(true);
+      // Fetch user details to check for admin status
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/me`, {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.is_admin) {
+          setIsAdmin(true);
+        }
+      })
+      .catch(err => {
+        console.error("Error fetching user details:", err);
+        // If token is invalid, log out
+        if (err.status === 401) {
+          handleLogout();
+        }
+      });
     }
 
     const handleScroll = () => {
@@ -52,10 +72,20 @@ const Navbar = () => {
     setIsOpen(!isOpen);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    const token = localStorage.getItem("access_token");
+    if (token) {
+      try {
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/logout`, {
+          method: 'POST',
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+      } catch (err) {
+        console.error("Logout API failed:", err);
+      }
+    }
     localStorage.removeItem("access_token");
     setIsLoggedIn(false);
-    // Optionally redirect to home or login page
     window.location.href = "/";
   };
 
@@ -73,6 +103,7 @@ const Navbar = () => {
           {/* Desktop Menu */}
           <div className="nav-links">
             <Link href="/" className="nav-link">Home</Link>
+            {isAdmin && <Link href="/admin/dashboard" className="nav-link">Dashboard</Link>}
             <Link href="/services" className="nav-link">Services</Link>
             <Link href="/products" className="nav-link">Products</Link>
             <Link href="/about" className="nav-link">About Us</Link>
@@ -110,6 +141,11 @@ const Navbar = () => {
           <Link href="/" className="mobile-link" onClick={toggleMenu}>
             <LayoutGrid size={20} className="mobile-icon" /> Home
           </Link>
+          {isAdmin && (
+            <Link href="/admin/dashboard" className="mobile-link" onClick={toggleMenu}>
+              <LayoutGrid size={20} className="mobile-icon" /> Dashboard
+            </Link>
+          )}
           <Link href="/services" className="mobile-link" onClick={toggleMenu}>
             <Briefcase size={20} className="mobile-icon" /> Services
           </Link>
