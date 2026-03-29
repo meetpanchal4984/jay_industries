@@ -129,7 +129,7 @@ export default function ProductDetails() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--copper)', fontWeight: '800', fontSize: '0.8rem', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '1rem' }}>
                     <Package size={16} /> Premium Quality
                   </div>
-                  <h1 className="heading-lg" style={{ marginBottom: '1.5rem', fontSize: '3.5rem' }}>{product.name}</h1>
+                  <h1 className="heading-lg" style={{ marginBottom: '1.5rem', fontSize: '2.5rem', lineHeight: '1.2' }}>{product.name}</h1>
 
                   <div className="glass-panel" style={{ padding: '2.5rem', borderRadius: '24px', marginBottom: '2.5rem' }}>
                     <h3 style={{ fontSize: '1.2rem', fontWeight: '800', marginBottom: '1rem' }}>Description</h3>
@@ -180,7 +180,7 @@ export default function ProductDetails() {
         }
         @media (max-width: 968px) {
           .grid-2 { grid-template-columns: 1fr !important; gap: 3rem !important; }
-          .heading-lg { fontSize: 2.5rem !important; }
+          .heading-lg { fontSize: 1.8rem !important; lineHeight: 1.3 !important; }
         }
       `}</style>
     </div>
