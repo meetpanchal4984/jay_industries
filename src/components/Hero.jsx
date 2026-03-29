@@ -66,7 +66,7 @@ const Hero = () => {
           </h1>
           <p className="hero-desc text-lg text-muted">
             Jay Industries provides top-tier CNC laser cutting service and job work in Ahmedabad.
-            From metal to acrylic, we deliver absolute precision.
+            From metal components to complex designs, we deliver absolute precision.
           </p>
           <div className="hero-actions">
             <Link href="/services" className="btn btn-primary">Our Services</Link>
