@@ -23,7 +23,7 @@ const dummyProducts = [
   { id: 17, title: 'MS Machine Frames', category: 'Metal', image: './laser_cut_metal_gear_1773484656911.png', desc: 'Heavy-duty machine base frames.' },
   { id: 18, title: 'Lift Interiors', category: 'Metal', image: './laser_cut_metal_gear_1773484656911.png', desc: 'Decorative elevator panelling.' },
   { id: 19, title: 'Control Panel Facades', category: 'Metal', image: './laser_cut_metal_gear_1773484656911.png', desc: 'Precision sheets for electrical controls.' },
-  { id: 20, title: 'Brass Letters', category: 'Metal', image: './laser_cut_metal_gear_1773484656911.png', desc: 'Premium solid brass text.' }
+  { id: 20, title: 'Industrial Metal Ladder', category: 'Metal', image: './industrial_laser_background_1773484815633.png', desc: 'Custom-built industrial ladders and safety steps.' }
 ];
 
 const Products = () => {

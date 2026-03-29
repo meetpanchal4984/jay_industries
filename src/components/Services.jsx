@@ -33,12 +33,12 @@ const services = [
     icon: '🛠️',
     desc: 'End-to-end custom metal fabrication and job work tailored precisely to your design requirements.'
   },
-  // {
-  //   id: 6,
-  //   title: 'Engraving & Marking',
-  //   icon: '✍️',
-  //   desc: 'Permanent laser marking and deep engraving on various industrial parts and corporate gifts.'
-  // }
+  {
+    id: 6,
+    title: 'Playground Equipment',
+    icon: '🪜',
+    desc: 'High-quality, durable metal steps, industrial ladders, and safety staircases designed for longevity.'
+  }
 ];
 
 const Services = () => {
