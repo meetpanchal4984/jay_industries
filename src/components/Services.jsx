@@ -7,7 +7,7 @@ const services = [
     id: 1,
     title: 'Laser Cutting',
     icon: '✂️',
-    desc: 'High-precision CNC laser cutting for metals, acrylics, and wood with perfect edge finishing.'
+    desc: 'High-precision CNC laser cutting for various metals and industrial materials with perfect edge finishing.'
   },
   {
     id: 2,
@@ -23,22 +23,22 @@ const services = [
   },
   {
     id: 4,
-    title: 'CNC Router Work',
-    icon: '🪵',
-    desc: 'Advanced CNC routing for wood carving, MDF jali designs, and non-metal detailed fabrication.'
+    title: 'Welding & Assembly',
+    icon: '👨‍🏭',
+    desc: 'Professional TIG, MIG, and spot welding services for complete metal structure assemblies.'
   },
   {
     id: 5,
     title: 'Custom Fabrication',
     icon: '🛠️',
-    desc: 'End-to-end custom metal and acrylic fabrication tailored precisely to your design requirements.'
+    desc: 'End-to-end custom metal fabrication and job work tailored precisely to your design requirements.'
   },
-  {
-    id: 6,
-    title: 'Engraving & Marking',
-    icon: '✍️',
-    desc: 'Permanent laser marking and deep engraving on various industrial parts and corporate gifts.'
-  }
+  // {
+  //   id: 6,
+  //   title: 'Engraving & Marking',
+  //   icon: '✍️',
+  //   desc: 'Permanent laser marking and deep engraving on various industrial parts and corporate gifts.'
+  // }
 ];
 
 const Services = () => {
@@ -54,7 +54,7 @@ const Services = () => {
 
         <div className="services-grid grid-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
           {services.map((service, index) => (
-            <motion.div 
+            <motion.div
               key={service.id}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}

@@ -18,7 +18,7 @@ const About = () => {
               <span className="stats-num">10+</span>
               <span className="stats-text text-muted">Years Experience</span>
             </div>
-            <img src="./laser_cut_acrylic_sign_1773484675065.png" alt="Laser Cutting Acrylic Sign" className="responsive-img" />
+            <img src="./laser_cut_metal_gear_1773484656911.png" alt="Laser Cutting Metal Component" className="responsive-img" />
           </motion.div>
 
           <motion.div
@@ -54,7 +54,7 @@ const About = () => {
                 <div className="feature-icon">🛠️</div>
                 <div>
                   <h4 className="feature-title">Versatile Materials</h4>
-                  <p className="text-muted feature-text">Expertise in cutting metal, acrylic, wood, and more.</p>
+                  <p className="text-muted feature-text">Expertise in cutting various metals and industrial sheets with high precision.</p>
                 </div>
               </li>
             </ul>
