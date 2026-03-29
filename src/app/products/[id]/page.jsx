@@ -4,7 +4,7 @@ import { useParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ChevronLeft, MessageSquare, Package, Maximize2, X } from 'lucide-react';
+import { ChevronLeft, Package, Maximize2, X } from 'lucide-react';
 import { resolveBackendUrl } from '@/utils/url';
 
 export default function ProductDetails() {
