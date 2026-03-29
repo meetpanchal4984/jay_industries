@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ChevronLeft, MessageSquare, Package, Maximize2, X } from 'lucide-react';
+import { resolveBackendUrl } from '@/utils/url';
 
 export default function ProductDetails() {
   const { id } = useParams();
@@ -14,7 +15,7 @@ export default function ProductDetails() {
   const [selectedImage, setSelectedImage] = useState(null);
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/${id}`)
+    fetch(resolveBackendUrl(`/products/${id}`))
       .then(res => {
         if (!res.ok) throw new Error("Product not found");
         return res.json();
@@ -30,16 +31,9 @@ export default function ProductDetails() {
       });
   }, [id]);
 
-  const resolveUrl = (url) => {
-    if (url && url.startsWith('/static/')) {
-      return `${process.env.NEXT_PUBLIC_API_URL}${url}`;
-    }
-    return url;
-  };
-
   const allImages = product ? [
-    { id: 'main', url: resolveUrl(product.image_url) },
-    ...(product.sub_images || []).map(img => ({ id: img.id, url: resolveUrl(img.image_url) }))
+    { id: 'main', url: resolveBackendUrl(product.image_url) },
+    ...(product.sub_images || []).map(img => ({ id: img.id, url: resolveBackendUrl(img.image_url) }))
   ] : [];
 
   if (error) {

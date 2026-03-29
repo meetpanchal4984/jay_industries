@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { LayoutGrid, Users, Briefcase, Package, X } from 'lucide-react';
+import { resolveBackendUrl } from '@/utils/url';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -16,7 +17,7 @@ const Navbar = () => {
     if (token) {
       setIsLoggedIn(true);
       // Fetch user details to check for admin status
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/me`, {
+      fetch(resolveBackendUrl('/me'), {
         headers: {
           "Authorization": `Bearer ${token}`
         }
@@ -76,7 +77,7 @@ const Navbar = () => {
     const token = localStorage.getItem("access_token");
     if (token) {
       try {
-        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/logout`, {
+        await fetch(resolveBackendUrl('/logout'), {
           method: 'POST',
           headers: { "Authorization": `Bearer ${token}` }
         });
