@@ -1,7 +1,8 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import AuthGuard from '@/components/AuthGuard';
-import { Users, UserCheck, Activity, Package, Plus, Image as ImageIcon, Type, FileText, X, ShieldAlert, ShieldCheck, ExternalLink, LogOut, Eye, EyeOff } from 'lucide-react';
+import { Users, UserCheck, Activity, Package, Plus, Image as ImageIcon, Type, FileText, X, ShieldAlert, ShieldCheck, ExternalLink, LogOut, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { resolveBackendUrl } from '@/utils/url';
 
 // CountUp Component for animated statistics with smooth transitions
 const CountUp = ({ end, duration = 1000 }) => {
@@ -81,7 +82,7 @@ export default function AdminDashboard() {
       return;
     }
 
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/me`, {
+    fetch(resolveBackendUrl('/me'), {
       headers: { "Authorization": `Bearer ${token}` }
     })
       .then(res => res.json())
@@ -124,7 +125,7 @@ export default function AdminDashboard() {
 
   const fetchDashboardData = async (token) => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/dashboard-data`, {
+      const res = await fetch(resolveBackendUrl('/admin/dashboard-data'), {
         headers: { "Authorization": `Bearer ${token}` }
       });
       if (res.ok) {
@@ -147,7 +148,7 @@ export default function AdminDashboard() {
     setUsers(users.map(u => u.id === userId ? { ...u, is_admin: !u.is_admin } : u));
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/users/${userId}/toggle-admin`, {
+      const res = await fetch(resolveBackendUrl(`/admin/users/${userId}/toggle-admin`), {
         method: 'PUT',
         headers: { "Authorization": `Bearer ${token}` }
       });
@@ -177,7 +178,7 @@ export default function AdminDashboard() {
     setAdminProducts(adminProducts.map(p => p.id === productId ? { ...p, is_published: !p.is_published } : p));
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/products/${productId}/toggle-publish`, {
+      const res = await fetch(resolveBackendUrl(`/admin/products/${productId}/toggle-publish`), {
         method: 'PUT',
         headers: { "Authorization": `Bearer ${token}` }
       });
@@ -199,7 +200,7 @@ export default function AdminDashboard() {
 
     const token = localStorage.getItem("access_token");
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/products/${productId}`, {
+      const res = await fetch(resolveBackendUrl(`/admin/products/${productId}`), {
         method: "DELETE",
         headers: { "Authorization": `Bearer ${token}` }
       });
@@ -264,7 +265,7 @@ export default function AdminDashboard() {
     subFiles.forEach(file => formData.append('sub_images', file));
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products`, {
+      const res = await fetch(resolveBackendUrl('/products'), {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` },
         body: formData
@@ -294,7 +295,7 @@ export default function AdminDashboard() {
     const token = localStorage.getItem("access_token");
     if (token) {
       try {
-        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/logout`, {
+        await fetch(resolveBackendUrl('/logout'), {
           method: 'POST',
           headers: { "Authorization": `Bearer ${token}` }
         });
@@ -332,27 +333,13 @@ export default function AdminDashboard() {
     );
   }
 
-  if (isMobile) {
-    return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-main)', padding: '2rem', textAlign: 'center', color: 'var(--text-main)' }}>
-        <div className="glass-panel" style={{ padding: '3rem 2rem', maxWidth: '400px', borderRadius: '24px' }}>
-          <div style={{ width: '64px', height: '64px', background: 'rgba(234, 88, 12, 0.1)', color: 'var(--copper)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
-            <Activity size={32} />
-          </div>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: '800', marginBottom: '1rem' }}>Desktop View Required</h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '2rem' }}>
-            The Admin Dashboard is optimized for Desktop and Tablet experiences. Please log in from a larger device to manage your store.
-          </p>
-          <button
-            onClick={() => window.location.href = '/'}
-            style={{ width: '100%', padding: '1rem', background: 'var(--copper)', color: '#fff', borderRadius: '12px', fontWeight: '700', fontSize: '0.9rem' }}
-          >
-            Back to Website
-          </button>
-        </div>
-      </div>
-    );
-  }
+  // Mobile experience enhancement: We no longer block access but provide a notice
+  const MobileNotice = () => (
+    <div style={{ background: 'rgba(234, 88, 12, 0.1)', color: 'var(--copper)', padding: '1rem', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '2rem', border: '1px solid rgba(234, 88, 12, 0.2)' }}>
+      <AlertCircle size={20} />
+      <span style={{ fontSize: '0.85rem', fontWeight: '600' }}>Note: Admin dashboard is optimized for larger screens.</span>
+    </div>
+  );
 
   if (!isAdmin) return null;
 
@@ -423,6 +410,7 @@ export default function AdminDashboard() {
         <main style={{ flex: 1, marginLeft: '300px', height: '100vh', overflowY: 'auto', position: 'relative' }}>
           <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '4rem 5% 6rem' }}>
             <header style={{ marginBottom: '3.5rem' }}>
+              {isMobile && <MobileNotice />}
               <div style={{ display: 'inline-block', padding: '0.5rem 1rem', borderRadius: '30px', background: 'rgba(234, 88, 12, 0.1)', color: 'var(--copper)', fontWeight: '700', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '1rem' }}>
                 ADMINISTRATIVE AREA
               </div>
@@ -729,7 +717,7 @@ export default function AdminDashboard() {
                         <tr key={product.id} className="user-row" style={{ background: 'rgba(255,255,255,0.02)' }}>
                           <td style={{ padding: '1.5rem 1rem' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
-                              <img src={`${process.env.NEXT_PUBLIC_API_URL}${product.image_url}`} style={{ width: '56px', height: '56px', borderRadius: '10px', objectFit: 'cover', border: '1px solid var(--glass-border)' }} />
+                            <img src={resolveBackendUrl(product.image_url)} style={{ width: '56px', height: '56px', borderRadius: '10px', objectFit: 'cover', border: '1px solid var(--glass-border)' }} />
                               <div>
                                 <div style={{ fontWeight: '800', fontSize: '1rem', color: 'var(--text-main)', marginBottom: '0.2rem' }}>{product.name}</div>
                                 <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '500', maxWidth: '350px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>

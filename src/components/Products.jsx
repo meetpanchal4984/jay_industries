@@ -2,28 +2,29 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { resolveBackendUrl } from '@/utils/url';
 
 const dummyProducts = [
-  { id: 1, title: 'Custom Metal Gears', category: 'Metal', image: './laser_cut_metal_gear_1773484656911.png', desc: 'Precision metallic gear components.' },
-  { id: 2, title: 'Precision CNC Bending', category: 'Metal', image: './laser_cut_metal_gear_1773484656911.png', desc: 'Expert metal bending service for manufacturing.' },
-  { id: 3, title: 'Sheet Metal Perforation', category: 'Metal', image: './laser_cut_metal_gear_1773484656911.png', desc: 'Custom perforation patterns on steel sheets.' },
-  { id: 4, title: 'Sheet Metal Enclosure', category: 'Metal', image: './laser_cut_metal_gear_1773484656911.png', desc: 'Durable custom metal enclosures.' },
-  { id: 5, title: 'Precision Machinery Parts', category: 'Metal', image: './laser_cut_metal_gear_1773484656911.png', desc: 'Industrial machine components.' },
-  { id: 6, title: 'Steel Bracket Assembly', category: 'Metal', image: './laser_cut_metal_gear_1773484656911.png', desc: 'Precision welded metal brackets.' },
-  { id: 7, title: 'MS CNC Cut Jali', category: 'Metal', image: './laser_cut_metal_gear_1773484656911.png', desc: 'Mild steel laser-cut jali for architecture.' },
-  { id: 8, title: 'Stainless Steel Letters', category: 'Metal', image: './laser_cut_metal_gear_1773484656911.png', desc: 'Outdoor SS branding letters.' },
-  { id: 9, title: 'Industrial Mesh Panels', category: 'Metal', image: './laser_cut_metal_gear_1773484656911.png', desc: 'Laser-cut mesh panels for industrial use.' },
-  { id: 10, title: 'Metal Stencils', category: 'Metal', image: './laser_cut_metal_gear_1773484656911.png', desc: 'Stencils for scale painting.' },
-  { id: 11, title: 'Engraved Metal Nameplates', category: 'Metal', image: './laser_cut_metal_gear_1773484656911.png', desc: 'Deep-etched industrial metal plates.' },
-  { id: 12, title: 'Mild Steel Grills', category: 'Metal', image: './laser_cut_metal_gear_1773484656911.png', desc: 'Architectural steel grills.' },
-  { id: 13, title: 'Metal Architectural Panels', category: 'Metal', image: './laser_cut_metal_gear_1773484656911.png', desc: 'Custom laser-cut panels for buildings.' },
-  { id: 14, title: 'Industrial Safety Grills', category: 'Metal', image: './laser_cut_metal_gear_1773484656911.png', desc: 'Metal safety components for machinery.' },
-  { id: 15, title: 'Metal Enclosures', category: 'Metal', image: './laser_cut_metal_gear_1773484656911.png', desc: 'Protective casing for electronics.' },
-  { id: 16, title: 'Metal Switchboard Plates', category: 'Metal', image: './laser_cut_metal_gear_1773484656911.png', desc: 'Precision-cut metal control panels.' },
-  { id: 17, title: 'MS Machine Frames', category: 'Metal', image: './laser_cut_metal_gear_1773484656911.png', desc: 'Heavy-duty machine base frames.' },
-  { id: 18, title: 'Lift Interiors', category: 'Metal', image: './laser_cut_metal_gear_1773484656911.png', desc: 'Decorative elevator panelling.' },
-  { id: 19, title: 'Control Panel Facades', category: 'Metal', image: './laser_cut_metal_gear_1773484656911.png', desc: 'Precision sheets for electrical controls.' },
-  { id: 20, title: 'Industrial Metal Ladder', category: 'Metal', image: './industrial_laser_background_1773484815633.png', desc: 'Custom-built industrial ladders and safety steps.' }
+  { id: 1, title: 'Custom Metal Gears', category: 'Metal', image: '/laser_cut_metal_gear_1773484656911.png', desc: 'Precision metallic gear components.' },
+  { id: 2, title: 'Precision CNC Bending', category: 'Metal', image: '/laser_cut_metal_gear_1773484656911.png', desc: 'Expert metal bending service for manufacturing.' },
+  { id: 3, title: 'Sheet Metal Perforation', category: 'Metal', image: '/laser_cut_metal_gear_1773484656911.png', desc: 'Custom perforation patterns on steel sheets.' },
+  { id: 4, title: 'Sheet Metal Enclosure', category: 'Metal', image: '/laser_cut_metal_gear_1773484656911.png', desc: 'Durable custom metal enclosures.' },
+  { id: 5, title: 'Precision Machinery Parts', category: 'Metal', image: '/laser_cut_metal_gear_1773484656911.png', desc: 'Industrial machine components.' },
+  { id: 6, title: 'Steel Bracket Assembly', category: 'Metal', image: '/laser_cut_metal_gear_1773484656911.png', desc: 'Precision welded metal brackets.' },
+  { id: 7, title: 'MS CNC Cut Jali', category: 'Metal', image: '/laser_cut_metal_gear_1773484656911.png', desc: 'Mild steel laser-cut jali for architecture.' },
+  { id: 8, title: 'Stainless Steel Letters', category: 'Metal', image: '/laser_cut_metal_gear_1773484656911.png', desc: 'Outdoor SS branding letters.' },
+  { id: 9, title: 'Industrial Mesh Panels', category: 'Metal', image: '/laser_cut_metal_gear_1773484656911.png', desc: 'Laser-cut mesh panels for industrial use.' },
+  { id: 10, title: 'Metal Stencils', category: 'Metal', image: '/laser_cut_metal_gear_1773484656911.png', desc: 'Stencils for scale painting.' },
+  { id: 11, title: 'Engraved Metal Nameplates', category: 'Metal', image: '/laser_cut_metal_gear_1773484656911.png', desc: 'Deep-etched industrial metal plates.' },
+  { id: 12, title: 'Mild Steel Grills', category: 'Metal', image: '/laser_cut_metal_gear_1773484656911.png', desc: 'Architectural steel grills.' },
+  { id: 13, title: 'Metal Architectural Panels', category: 'Metal', image: '/laser_cut_metal_gear_1773484656911.png', desc: 'Custom laser-cut panels for buildings.' },
+  { id: 14, title: 'Industrial Safety Grills', category: 'Metal', image: '/laser_cut_metal_gear_1773484656911.png', desc: 'Metal safety components for machinery.' },
+  { id: 15, title: 'Metal Enclosures', category: 'Metal', image: '/laser_cut_metal_gear_1773484656911.png', desc: 'Protective casing for electronics.' },
+  { id: 16, title: 'Metal Switchboard Plates', category: 'Metal', image: '/laser_cut_metal_gear_1773484656911.png', desc: 'Precision-cut metal control panels.' },
+  { id: 17, title: 'MS Machine Frames', category: 'Metal', image: '/laser_cut_metal_gear_1773484656911.png', desc: 'Heavy-duty machine base frames.' },
+  { id: 18, title: 'Lift Interiors', category: 'Metal', image: '/laser_cut_metal_gear_1773484656911.png', desc: 'Decorative elevator panelling.' },
+  { id: 19, title: 'Control Panel Facades', category: 'Metal', image: '/laser_cut_metal_gear_1773484656911.png', desc: 'Precision sheets for electrical controls.' },
+  { id: 20, title: 'Industrial Metal Ladder', category: 'Metal', image: '/industrial_laser_background_1773484815633.png', desc: 'Custom-built industrial ladders and safety steps.' }
 ];
 
 const Products = () => {
@@ -32,7 +33,7 @@ const Products = () => {
   const [loading, setLoading] = useState(true);
 
   React.useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/products`)
+    fetch(resolveBackendUrl('/products'))
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {
@@ -45,10 +46,7 @@ const Products = () => {
 
   const productsData = backendProducts.length > 0
     ? backendProducts.map(p => {
-      let imageUrl = p.image_url;
-      if (imageUrl && imageUrl.startsWith('/static/')) {
-        imageUrl = `${process.env.NEXT_PUBLIC_API_URL}${imageUrl}`;
-      }
+      let imageUrl = resolveBackendUrl(p.image_url);
       return { id: p.id, title: p.name, desc: p.description, image: imageUrl };
     })
     : (!loading ? dummyProducts : []);
